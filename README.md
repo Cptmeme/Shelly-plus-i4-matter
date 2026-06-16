@@ -43,6 +43,7 @@ etc.
 - [Restore the stock firmware](#restore-the-stock-firmware)
 - [Compatibility notes](#compatibility-notes)
 - [Credits](#credits)
+- [License](#license)
 
 ---
 
@@ -306,5 +307,24 @@ The base of this code comes from
 adapts that work to the i4's ESP32-U4WDH hardware and exposes the four inputs as
 Matter Generic Switches over Wi-Fi (the i4's ESP32 has no 802.15.4 radio, so it
 runs Matter over Wi-Fi rather than over Thread). Thanks to that project for the
-foundation. Both build on Espressif's [esp-matter](https://github.com/espressif/esp-matter)
-SDK. Licensed under Apache 2.0.
+foundation. Both the base project and Espressif's
+[esp-matter](https://github.com/espressif/esp-matter) SDK are licensed under the
+Apache License 2.0.
+
+---
+
+## License
+
+This firmware is released under the **GNU General Public License v3.0** — see
+[LICENSE](LICENSE).
+
+It incorporates code from the [base repo](#credits) and from Espressif's
+esp-matter SDK, both under the **Apache License 2.0**. Apache 2.0 is one-way
+compatible with GPL v3, so the combined work may be distributed under GPL v3 —
+but the Apache-licensed portions keep their original Apache 2.0 license headers,
+copyright notices, and `NOTICE` file (Apache 2.0 §4 requires this; don't delete
+them). Keep the upstream Apache `LICENSE`/`NOTICE` alongside the project's
+GPL-3.0 `LICENSE`.
+
+> Apache 2.0 is compatible with GPL **v3**, but **not** GPL v2 — so v3 (or later)
+> is required here. This is general information, not legal advice.
