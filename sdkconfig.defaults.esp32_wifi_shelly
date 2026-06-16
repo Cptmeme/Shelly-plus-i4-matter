@@ -1,0 +1,52 @@
+# Shelly Plus i4 — Matter over Wi-Fi (ESP32-U4WDH)
+#
+# Build with:
+#   rm -f sdkconfig
+#   idf.py -D SDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.defaults.esp32_wifi_shelly" set-target esp32
+#   idf.py -D SDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.defaults.esp32_wifi_shelly" build
+#
+# This overlay is the counterpart to sdkconfig.defaults.c6_thread_shelly,
+# but targets the classic single-core ESP32 used in the Shelly Plus i4,
+# which has no 802.15.4 radio and therefore runs Matter over Wi-Fi.
+
+CONFIG_IDF_TARGET="esp32"
+
+# CRITICAL: The Shelly Plus i4 uses the single-core ESP32-U4WDH-S.
+# A dual-core build fails to boot on a single-core part (it stalls
+# starting APP_CPU). Confirm your unit is the "-S" single-core variant.
+CONFIG_FREERTOS_UNICORE=y
+
+# 4 MB embedded flash (no PSRAM on the U4WDH)
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+CONFIG_ESPTOOLPY_FLASHSIZE="4MB"
+
+# --- Transport: Matter over Wi-Fi, BLE for commissioning only ---
+CONFIG_ENABLE_WIFI_STATION=y
+CONFIG_ENABLE_WIFI_AP=n
+CONFIG_ESP_WIFI_SOFTAP_SUPPORT=n
+
+# NimBLE is used only to commission; the stack is reclaimed afterwards
+CONFIG_BT_ENABLED=y
+CONFIG_BT_NIMBLE_ENABLED=y
+CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING=y
+
+# OpenThread is unavailable on this chip — keep it off explicitly
+CONFIG_OPENTHREAD_ENABLED=n
+
+# --- Partition table (4 MB, dual-OTA) ---
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+CONFIG_PARTITION_TABLE_OFFSET=0xC000
+
+# --- Project metadata / certs ---
+CONFIG_CHIP_PROJECT_CONFIG="main/CHIPProjectConfig.h"
+# Matter HardwareVersion (number). String + SoftwareVersion live in
+# main/CHIPProjectConfig.h. HW 2.0.0 / SW 1.0.0.
+CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION=2
+
+# Factory-reset / diagnostics over the serial console
+CONFIG_ENABLE_CHIP_SHELL=y
+
+# Longer hold before any console/button factory reset is honoured
+CONFIG_BUTTON_PERIOD_TIME_MS=20
+CONFIG_BUTTON_LONG_PRESS_TIME_MS=5000
