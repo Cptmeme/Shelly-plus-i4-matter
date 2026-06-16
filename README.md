@@ -17,8 +17,12 @@ etc.
 > Shelly, Allterco Robotics, CSA, or Espressif Systems.
 
 > **This is the prebuilt-binary guide.** It walks you through flashing the
-> ready-made `.bin` files in this folder — no toolchain or compiler needed. If
-> you want to build from source instead, see [docs/BUILDING.md](../docs/BUILDING.md).
+> ready-made `.bin` files in the [`prebuilt/`](prebuilt/) folder — no toolchain
+> or compiler needed. If you want to build from source instead, the ESP-IDF /
+> esp-matter build flow is documented in the base repo's
+> [build guide](https://github.com/automatous-io/shelly-1-gen4-matter-thread/blob/main/docs/BUILDING.md)
+> (written for the Shelly 1 Gen4, but the toolchain and steps are the same — see
+> [Credits](#credits)).
 
 ---
 
@@ -26,7 +30,7 @@ etc.
 
 - [What you get](#what-you-get)
 - [Input → GPIO → endpoint map](#input--gpio--endpoint-map)
-- [Files in this folder](#files-in-this-folder)
+- [Prebuilt files](#prebuilt-files)
 - [What you'll need](#what-youll-need)
 - [⚠️ Safety — read before you wire anything](#️-safety--read-before-you-wire-anything)
 - [Wiring the USB-UART adapter](#wiring-the-usb-uart-adapter)
@@ -65,12 +69,15 @@ etc.
 
 ---
 
-## Files in this folder
+## Prebuilt files
+
+These live in the [`prebuilt/`](prebuilt/) folder (the commands below assume you
+run them from the repo root, so they're prefixed with `prebuilt/`):
 
 | File | Flash offset | Size | When to use |
 |------|--------------|------|-------------|
-| `shelly_plus_i4_matter_v1.0.0.bin` | `0x0` | 4 MB (4,194,304 B) | **Recommended.** Full image — bootloader + partition table + app in one write. Use this for a first install. |
-| `shelly_plus_i4_matter_v1.0.0_app_0x20000.bin` | `0x20000` | ~1.41 MB (1,483,056 B) | App only. Use for updates that keep the **same** bootloader/partition table. Skip this unless you know you need it. |
+| `prebuilt/shelly_plus_i4_matter_v1.0.0.bin` | `0x0` | 4 MB (4,194,304 B) | **Recommended.** Full image — bootloader + partition table + app in one write. Use this for a first install. |
+| `prebuilt/shelly_plus_i4_matter_v1.0.0_app_0x20000.bin` | `0x20000` | ~1.41 MB (1,483,056 B) | App only. Use for updates that keep the **same** bootloader/partition table. Skip this unless you know you need it. |
 
 **SHA-256 — verify before flashing:**
 
@@ -79,14 +86,14 @@ shelly_plus_i4_matter_v1.0.0.bin            906f5be7aaf215b50f5bb056e3f21ec3926a
 shelly_plus_i4_matter_v1.0.0_app_0x20000.bin 25f0784e501d53034ddd9c903f9c0843b19fb7ba9bc570d70a27e77df121f693
 ```
 
-Check on your machine before flashing:
+Check on your machine before flashing (run from the repo root):
 
 ```bash
 # macOS / Linux
-shasum -a 256 shelly_plus_i4_matter_v1.0.0.bin
+shasum -a 256 prebuilt/shelly_plus_i4_matter_v1.0.0.bin
 
 # Windows (PowerShell)
-Get-FileHash shelly_plus_i4_matter_v1.0.0.bin -Algorithm SHA256
+Get-FileHash prebuilt\shelly_plus_i4_matter_v1.0.0.bin -Algorithm SHA256
 ```
 
 The output must match the hash above exactly. If it doesn't, re-download — do
@@ -105,7 +112,7 @@ The output must match the hash above exactly. If it doesn't, re-download — do
 - **[esptool](https://github.com/espressif/esptool)** (`pip install esptool`) for
   the command-line path, **or** a Chromium-based browser (Chrome/Edge) for the
   browser-flasher path — no install needed.
-- This folder's `.bin` files.
+- The `.bin` files from the [`prebuilt/`](prebuilt/) folder.
 
 ---
 
@@ -196,18 +203,18 @@ of the two paths below.
 
 ### Option A — esptool (command line)
 
-Full image (recommended, single command):
+Full image (recommended, single command — run from the repo root):
 
 ```bash
 esptool --chip esp32 --port <PORT> --baud 115200 \
-  write_flash 0x0 shelly_plus_i4_matter_v1.0.0.bin
+  write_flash 0x0 prebuilt/shelly_plus_i4_matter_v1.0.0.bin
 ```
 
 App-only update (only if you're keeping the existing bootloader/partition table):
 
 ```bash
 esptool --chip esp32 --port <PORT> --baud 115200 \
-  write_flash 0x20000 shelly_plus_i4_matter_v1.0.0_app_0x20000.bin
+  write_flash 0x20000 prebuilt/shelly_plus_i4_matter_v1.0.0_app_0x20000.bin
 ```
 
 ### Option B — browser flasher (no install)
@@ -217,7 +224,8 @@ Use a Web Serial flasher such as
 [esptool-js](https://espressif.github.io/esptool-js/) in Chrome or Edge:
 
 1. Click **Connect** and pick your USB-UART serial port.
-2. Select `shelly_plus_i4_matter_v1.0.0.bin` and set the offset to `0x0`.
+2. Select the full image `shelly_plus_i4_matter_v1.0.0.bin` (from the `prebuilt/`
+   folder) and set the offset to `0x0`.
 3. Flash and wait for the success message.
 
 ---
