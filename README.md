@@ -294,8 +294,6 @@ To go back to factory Shelly firmware, flash the backup you made in
 
 - Built for the **ESP32-U4WDH** in the Shelly Plus i4. Do not flash to other
   Shelly models — the GPIO map and embedded-flash pinout are i4-specific.
-- Requires a unit **without flash encryption / secure boot** (standard for
-  retail i4 units). A locked unit will reject a plaintext image.
 
 ---
 
