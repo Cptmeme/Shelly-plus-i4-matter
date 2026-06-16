@@ -317,14 +317,3 @@ Apache License 2.0.
 
 This firmware is released under the **GNU General Public License v3.0** — see
 [LICENSE](LICENSE).
-
-It incorporates code from the [base repo](#credits) and from Espressif's
-esp-matter SDK, both under the **Apache License 2.0**. Apache 2.0 is one-way
-compatible with GPL v3, so the combined work may be distributed under GPL v3 —
-but the Apache-licensed portions keep their original Apache 2.0 license headers,
-copyright notices, and `NOTICE` file (Apache 2.0 §4 requires this; don't delete
-them). Keep the upstream Apache `LICENSE`/`NOTICE` alongside the project's
-GPL-3.0 `LICENSE`.
-
-> Apache 2.0 is compatible with GPL **v3**, but **not** GPL v2 — so v3 (or later)
-> is required here. This is general information, not legal advice.
