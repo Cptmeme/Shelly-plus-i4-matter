@@ -40,6 +40,7 @@ etc.
 - [Step 4 — Boot and verify](#step-4--boot-and-verify)
 - [Pair it (commissioning)](#pair-it-commissioning)
 - [Factory reset](#factory-reset)
+- [🔄 Updating the firmware](#-updating-the-firmware)
 - [Restore the stock firmware](#restore-the-stock-firmware)
 - [Compatibility notes](#compatibility-notes)
 - [Credits](#credits)
@@ -270,6 +271,59 @@ re-commissioning.
 
 > If commissioning stalls at the very first step after a reset, **power-cycle the
 > device once** — a known ESP32 BLE-after-soft-reboot quirk.
+
+---
+
+## 🔄 Updating the firmware
+
+This applies to firmware you build from source (see the build guide linked at
+the top). The build produces `build/shelly_plus_i4-ota.bin`, a Matter OTA image,
+next to the normal serial-flash files.
+
+### Versions
+
+Bump all three for every release, or the device ignores the update. The build
+fails if the two numbers differ.
+
+* `PROJECT_VER` (e.g. `"1.1"`) and `PROJECT_VER_NUMBER` (e.g. `2`) in `CMakeLists.txt`
+* `CONFIG_DEVICE_SOFTWARE_VERSION_NUMBER` in `sdkconfig` / `sdkconfig.defaults` (same number)
+
+### Over the serial wires
+
+A normal `idf.py -p <PORT> flash` still works — put the i4 in
+[download mode](#step-1--enter-download-mode) first, as for the prebuilt images.
+This is also the only way to write the bootloader, and automatic rollback (see
+below) needs the bootloader from this build. A device that is only ever updated
+over the air (e.g. one flashed with the prebuilt v1.0.0 image) still updates
+fine; it just won't roll back.
+
+### Over the air (Matter OTA over Wi-Fi)
+
+Apple Home and Google Home only update certified devices, so you serve the image
+yourself with the Matter SDK's host tools. Build them from the SDK with
+`./scripts/build/build_examples.py --target darwin-arm64-chip-tool --target darwin-arm64-ota-provider build`.
+
+One-time setup: in your Matter app, turn on pairing mode for the i4, then add
+the provider and the i4 to `chip-tool`'s fabric:
+
+```bash
+chip-tool pairing code 2 <setup-code-from-home-app>              # i4 = node 2
+chip-ota-provider-app -f build/shelly_plus_i4-ota.bin --discriminator 3841 --secured-device-port 5565 &
+chip-tool pairing onnetwork-long 1 20202021 3841                 # provider = node 1
+chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": [{"cluster": 41, "endpoint": null, "deviceType": null}]}]' 1 0
+```
+
+Each update (with the provider running and serving the new `shelly_plus_i4-ota.bin`):
+
+```bash
+chip-tool otasoftwareupdaterequestor announce-otaprovider 1 0 2 0 2 0
+chip-tool basicinformation read software-version 2 0              # afterwards: the new number
+```
+
+The i4 downloads the image in the background, then restarts into the new
+version and keeps it once it has run for a minute while connected to Wi-Fi. If
+it doesn't get there within 5 minutes, or crashes before that, the bootloader
+automatically returns to the previous version.
 
 ---
 
